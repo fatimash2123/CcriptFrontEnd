@@ -34,21 +34,6 @@ function Appointments() {
 
         return;
     }, []);
-    //     {
-    //         reason: "Lorem Ipsum",
-    //         day: "monday",
-    //         start: "8 AM",
-    //         end: "10 AM",
-    //         totalTime: 3,
-    //     },
-    //     {
-    //         reason: "Lorem Ipsum",
-    //         day: "wednesday",
-    //         start: "11 AM",
-    //         end: "12 PM",
-    //         totalTime: 2,
-    //     },
-    // ];
 
     const daysOfWeek = [
         "monday",
