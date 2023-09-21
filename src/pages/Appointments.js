@@ -1,21 +1,54 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
 function Appointments() {
-    const userName = "Abubakar";
-    const appointments = [
-        {
-            reason: "Lorem Ipsum",
-            day: "monday",
-            start: "8 AM",
-            end: "10 AM",
-            totalTime: 3,
-        },
-        {
-            reason: "Lorem Ipsum",
-            day: "wednesday",
-            start: "11 AM",
-            end: "12 PM",
-            totalTime: 2,
-        },
-    ];
+    const [appointments, setAppointments] = useState([])
+    const [userName, setUserName] = useState("")
+    const navigate = useNavigate()
+    useEffect(() => {
+        const accessToken = JSON.parse(localStorage.getItem("accessToken"));
+        axios.get("https://ccript-task-b-ackend-77ir.vercel.app/api/appointments", {
+            headers: { Authorization: `Bearer ${accessToken}` },
+        })
+            .then(response => {
+                setAppointments(response.data.appointments)
+                setUserName(response.data.user)
+            })
+            .catch(err => {
+                console.log(err.response.status)
+                if (err.response.status === 401) {
+                    axios.get("https://ccript-task-b-ackend-77ir.vercel.app/api/refresh-token", {
+                        headers: { Authorization: `Bearer ${accessToken}` },
+                    })
+                        .then(response => {
+                            setAppointments(response.data.appointments)
+                            setUserName(response.data.user)
+                        })
+                        .catch(err => {
+                            navigate("/")
+                        })
+                }
+                navigate("/")
+            })
+
+        return;
+    }, []);
+    //     {
+    //         reason: "Lorem Ipsum",
+    //         day: "monday",
+    //         start: "8 AM",
+    //         end: "10 AM",
+    //         totalTime: 3,
+    //     },
+    //     {
+    //         reason: "Lorem Ipsum",
+    //         day: "wednesday",
+    //         start: "11 AM",
+    //         end: "12 PM",
+    //         totalTime: 2,
+    //     },
+    // ];
 
     const daysOfWeek = [
         "monday",
@@ -40,9 +73,9 @@ function Appointments() {
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                 >
                     {" "}
                     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />{" "}
@@ -73,18 +106,23 @@ function Appointments() {
                                         appointment.day === day &&
                                         time === parseInt(appointment.start) &&
                                         time < parseInt(appointment.end)
-
                                 );
-                                console.log("found=", matchingAppointment)
+                                console.log("found=", matchingAppointment);
                                 return (
-                                    <td rowspan={matchingAppointment?.totalTime} key={`${day}-${time}`} className="border-2 border-gray-300 h-[50px]">
-                                        {matchingAppointment ?
-                                            <div className="bg-emerald-200 rounded w-full h-full rounded-2xl flex flex-col justify-center">
+                                    <td
+                                        rowSpan={matchingAppointment?.totalTime}
+                                        key={`${day}-${time}`}
+                                        className="border-2 border-gray-300 h-[50px]"
+                                    >
+                                        {matchingAppointment ? (
+                                            <div className="bg-emerald-200 rounded w-full h-full rounded-2xl flex flex-col justify-center text-center">
                                                 <p className="font-bold">{userName}</p>
                                                 <p className="text-sm">Reason</p>
                                                 <p> {matchingAppointment.reason}</p>
                                             </div>
-                                            : ""}
+                                        ) : (
+                                            ""
+                                        )}
                                     </td>
                                 );
                             })}
